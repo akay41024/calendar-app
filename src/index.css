@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Comfortaa:wght@300..700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  font-family: "Comfortaa", sans-serif;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+.conatiner {
+  width: 100%;
+  height: 100vh;
+  background: rgb(31, 0, 36);
+  background: linear-gradient(
+    90deg,
+    rgba(31, 0, 36, 1) 0%,
+    rgba(121, 9, 100, 0.8239670868347339) 17%,
+    rgba(115, 19, 107, 0.4962359943977591) 56%,
+    rgba(13, 196, 240, 0.8911939775910365) 100%
+  );
+  display: grid;
+  place-items: center;
+  perspective: 100rem;
+}
