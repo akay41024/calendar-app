@@ -27,10 +27,22 @@ const Calendar = () => {
   const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" });
   const [eventText, setEventText] = useState("");
   const [editingEvent, setEditingEvent] = useState(null);
-  
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  
+  useEffect(() => {
+    // Load events from localStorage when the component mounts
+    const savedEvents = JSON.parse(localStorage.getItem("events")) || [];
+
+    // Convert date strings back to Date objects
+    const eventsWithDates = savedEvents.map((event) => ({
+      ...event,
+      date: new Date(event.date),
+    }));
+
+    setEvents(eventsWithDates);
+  }, []);
 
   const prevMonth = () => {
     setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
@@ -54,7 +66,7 @@ const Calendar = () => {
       setShowEventPopup(true);
       setEventTime({ hours: "00", minutes: "00" });
       setEventText("");
-      setEditingEvent(null)
+      setEditingEvent(null);
     }
   };
 
@@ -77,41 +89,42 @@ const Calendar = () => {
       text: eventText,
     };
 
-    let updatedEvents = [...events]
+    let updatedEvents = [...events];
 
     if (editingEvent) {
       updatedEvents = updatedEvents.map((event) =>
         event.id === editingEvent.id ? newEvent : event
       );
+    } else {
+      updatedEvents.push(newEvent);
     }
-    else{
-      updatedEvents.push(newEvent)
-    }
-    updatedEvents.sort((a,b) => new Date(a.date) - new Date(b.date))
+    updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     setEvents(updatedEvents);
+    localStorage.setItem("events", JSON.stringify(updatedEvents));
     setEventTime({ hours: "00", minutes: "00" });
     setEventText("");
     setShowEventPopup(false);
-    setEditingEvent(null)
+    setEditingEvent(null);
   };
 
   const handleEditEvent = (event) => {
-    setSelectedDate(new Date(event.date))
+    setSelectedDate(new Date(event.date));
     setEventTime({
-      hours: event.time.split(':')[0],
-      minutes: event.time.split(':')[1],
-    })
-    setEventText(event.text)
-    setEditingEvent(event)
-    setShowEventPopup(true)
-  }
+      hours: event.time.split(":")[0],
+      minutes: event.time.split(":")[1],
+    });
+    setEventText(event.text);
+    setEditingEvent(event);
+    setShowEventPopup(true);
+  };
 
   const handleDeleteEvent = (eventId) => {
-    const updatedEvents = events.filter((event) => event.id !== eventId)
+    const updatedEvents = events.filter((event) => event.id !== eventId);
 
-    setEvents(updatedEvents)
-  }
+    setEvents(updatedEvents);
+    localStorage.setItem("events", JSON.stringify(updatedEvents));
+  };
   return (
     <div className="calendar-app">
       <div className="calendar">
@@ -185,7 +198,9 @@ const Calendar = () => {
                 if (e.target.value.length <= 60) setEventText(e.target.value);
               }}
             ></textarea>
-            <div className="event-popup-btn" onClick={handleEventSubmit}>Add Event</div>
+            <div className="event-popup-btn" onClick={handleEventSubmit}>
+              Add Event
+            </div>
             <div
               className="close-event-popup"
               onClick={() => setShowEventPopup(false)}
@@ -197,13 +212,21 @@ const Calendar = () => {
         {events.map((event, index) => (
           <div className="event" key={index}>
             <div className="event-date-wrapper">
-              <div className="event-date">{`${monthsOfYear[event.date.getMonth()]} ${event.date.getDate()} ${event.date.getFullYear()}`}</div>
+              <div className="event-date">{`${
+                monthsOfYear[event.date.getMonth()]
+              } ${event.date.getDate()} ${event.date.getFullYear()}`}</div>
               <div className="event-time">{event.time}</div>
             </div>
             <div className="event-text">{event.text}</div>
             <div className="event-buttons">
-              <i className="bx bx-pencil" onClick={() => handleEditEvent(event)}></i>
-              <i className="bx bx-trash" onClick={() => handleDeleteEvent(event.id)}></i>
+              <i
+                className="bx bx-pencil"
+                onClick={() => handleEditEvent(event)}
+              ></i>
+              <i
+                className="bx bx-trash"
+                onClick={() => handleDeleteEvent(event.id)}
+              ></i>
             </div>
           </div>
         ))}
